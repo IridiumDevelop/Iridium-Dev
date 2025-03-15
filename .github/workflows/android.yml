@@ -1,0 +1,11 @@
+name: Build android
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: depot-ubuntu-22.04-16
+    steps:
+    - uses: actions/checkout@v4
+    - run: bash build_cromite_android_arm64.sh
