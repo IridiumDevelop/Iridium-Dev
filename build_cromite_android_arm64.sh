@@ -157,8 +157,8 @@ install_dependencies() {
   
   # 安装基础依赖
   sudo apt-get -y install sudo lsb-release bash wget apt-utils python3 python3-pip sed tzdata \
-    build-essential lib32gcc-9-dev g++-multilib dos2unix wiggle git curl lsof \
-    libgoogle-glog-dev libprotobuf23 libgrpc++1 parallel golang-go nano unzip \
+    build-essential g++-multilib dos2unix wiggle git curl lsof \
+    libprotobuf23 libgrpc++1 parallel golang-go nano unzip \
     ccache || error "安装依赖失败"
     
   # 设置ccache
