@@ -10,26 +10,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install basic dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y git python3 python3-pip
-
-    - name: Clone depot_tools
-      run: |
-        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-        echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
-
-    - name: Fetch Chromium source
-      run: |
-        mkdir chromium && cd chromium
-        fetch --nohooks --no-history android
-
     - uses: valeriangalliat/action-sshd-cloudflared@v3
 
     - name: Upload artifacts
