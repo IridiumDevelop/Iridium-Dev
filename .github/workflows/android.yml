@@ -5,7 +5,63 @@ on:
 
 jobs:
   build:
-    runs-on: depot-ubuntu-22.04-16
+    runs-on: depot-ubuntu-24.04-64
     steps:
-    - uses: actions/checkout@v4
-    - run: bash build_cromite_android_arm64.sh
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install basic dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git python3 python3-pip
+
+    - name: Clone depot_tools
+      run: |
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+        echo "$GITHUB_WORKSPACE/depot_tools" >> $GITHUB_PATH
+
+    - name: Fetch Chromium source
+      run: |
+        mkdir chromium && cd chromium
+        fetch --nohooks --no-history android
+        cd src
+
+    - name: Install build dependencies
+      run: |
+        cd chromium/src
+        sudo build/install-build-deps-android.sh --no-prompt
+
+    - name: Run hooks
+      run: |
+        cd chromium/src
+        gclient runhooks
+
+    - name: Configure GN build
+      run: |
+        cd chromium/src
+        gn args out/Default << EOF
+        target_os = "android"
+        target_cpu = "arm64"
+        is_debug = false
+        symbol_level = 1
+        enable_nacl = false
+        blink_symbol_level = 0
+        EOF
+
+    - name: Build Chrome APK
+      run: |
+        cd chromium/src
+        autoninja -C out/Default -j 64 chrome_public_apk
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: chromium-android-arm64
+        path: |
+          chromium/src/out/Default/apks/*.apk
+          chromium/src/out/Default/apks/*.aab
