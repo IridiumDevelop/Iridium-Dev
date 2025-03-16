@@ -1,15 +1,4 @@
 name: Build Cromite
-permissions:
-  actions: none
-  checks: none
-  contents: none
-  deployments: none
-  issues: none
-  packages: none
-  pull-requests: none
-  repository-projects: none
-  security-events: none
-  statuses: none
 
 on:
   workflow_dispatch:
@@ -21,15 +10,11 @@ on:
       target_os:
         description: 'targetos [android/win/linux/all]'
         required: true
-        default: 'all'
+        default: 'android'
       build:
         description: 'android arch [arm/arm64/x64/all]'
         required: true
         default: 'all'
-      type:
-        description: 'runner? [dev/ci]'
-        required: true
-        default: 'ci'
       debug:
         description: 'debug? [true/false]'
         required: true
@@ -46,7 +31,7 @@ env:
 
 jobs:
   check_images:
-    runs-on: ${{ github.event.inputs.type }}
+    runs-on: depot-ubuntu-24.04-64
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -54,16 +39,6 @@ jobs:
           path: cromite
           ref: ${{ github.event.inputs.sha }}
           fetch-depth: 1
-
-      - name: Enable proxy on container
-        shell: bash
-        run: |
-          if ! [[ -z "${HTTP_PROXY}" ]]; then
-            PROXY_ADDR=http://$(hostname -I | cut -d' ' -f1 | xargs):8118
-            echo "PROXY_ADDR=$PROXY_ADDR" >> $GITHUB_ENV
-            sudo iptables -D INPUT -p tcp -s localhost --dport 8118 -j ACCEPT
-            sudo iptables -D INPUT -p tcp --dport 8118 -j DROP
-          fi
 
       - name: Download regctl
         shell: bash
