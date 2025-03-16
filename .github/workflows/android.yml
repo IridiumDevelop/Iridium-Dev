@@ -34,7 +34,7 @@ jobs:
     - name: Install build dependencies
       run: |
         cd chromium/src
-        sudo build/install-build-deps-android.sh --no-prompt
+        sudo bash build/install-build-deps-android.sh --no-prompt
 
     - name: Run hooks
       run: |
